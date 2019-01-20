@@ -276,5 +276,24 @@ class HtmlTemplate {
 """
         const val simpleHtml: String = head + body + foot
 
+        const val template: String = """
+<!DOCTYPE html>
+<html>
+<script type="text/javascript">
+window.addEventListener("DOMContentLoaded", function () {
+   var contentHeight = document.getElementById("content").offsetHeight
+   window.JS._onDomContentLoaded(contentHeight);
+});
+</script>
+<body>
+<div id="header-spacer" style="height: %spx;"></div>
+<div id="content">
+%s
+</div>
+<div id="footer-spacer" style="height: %spx;"></div>
+</body>
+</html>
+"""
+
     }
 }
