@@ -7,7 +7,7 @@ import android.view.View
 import android.webkit.WebView
 
 class ArticleWebView @JvmOverloads constructor(context: Context, attrs: AttributeSet? = null, defStyle: Int = 0) :
-    WebView(context, attrs, defStyle), ArticleLayout.WebViewOnTouchDispatcher {
+    WebView(context, attrs, defStyle), ArticleContainer.WebViewOnTouchDispatcher {
 
     private var onScrollChangeListener: OnScrollChangeListenerCompat? = null
 

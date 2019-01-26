@@ -12,21 +12,21 @@ import android.webkit.WebView
 class WebViewActivity : AppCompatActivity() {
 
     lateinit var webView: ArticleWebView
-    lateinit var layout: ArticleLayout
+    lateinit var container: ArticleContainer
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_web_view)
 
         webView = findViewById(R.id.webView)
-        layout = findViewById(R.id.articleLayout)
+        container = findViewById(R.id.articleLayout)
 
         webView.setOnScrollChangeListenerCompat(object :ArticleWebView.OnScrollChangeListenerCompat{
             override fun onScrollChange(v: View, scrollX: Int, scrollY: Int, oldScrollX: Int, oldScrollY: Int) {
-                layout.dispatchScroll(oldScrollY, scrollY)
+                container.dispatchScroll(oldScrollY, scrollY)
             }
         })
-        layout.bind(webView)
+        container.bind(webView)
 
 
         WebView.setWebContentsDebuggingEnabled(true)
@@ -42,16 +42,16 @@ class WebViewActivity : AppCompatActivity() {
 
         val htmlText: String = String.format(
             HtmlTemplate.template,
-            webView.screenPxToWebPx(layout.fetchHeaderHeight()),
+            webView.screenPxToWebPx(container.fetchHeaderHeight()),
             HtmlTemplate.body,
-            webView.screenPxToWebPx(layout.fetchFooterHeight())
+            webView.screenPxToWebPx(container.fetchFooterHeight())
         )
         webView.loadData(htmlText, "text/html", "UTF-8")
     }
 
     private fun onDomContentLoaded(contentHeight: Int) {
         val webContentHeightDp = webView.webPxToScreenPx(contentHeight)
-        layout.onPageLoaded(webContentHeightDp)
+        container.onPageLoaded(webContentHeightDp)
     }
 
     private inner class JavascriptBridge {
