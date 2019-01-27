@@ -8,25 +8,28 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
 
-class ArticleContainer @JvmOverloads constructor(context: Context, attrs: AttributeSet? = null, defStyle: Int = 0) :
-    FrameLayout(context, attrs, defStyle) {
+/**
+ * ref https://android.googlesource.com/platform/packages/apps/UnifiedEmail/+/master/src/com/android/mail/browse/ConversationContainer.java#
+ */
+class ArticleContainer @JvmOverloads constructor(
+    context: Context,
+    attrs: AttributeSet? = null,
+    defStyle: Int = 0
+) : FrameLayout(context, attrs, defStyle) {
 
     private lateinit var header: View
     private lateinit var footer: View
+    private lateinit var webView: ArticleWebView
     private var widthMeasureSpec = 0
     private var webContentHeightDp = 0
     private var offsetY: Int = 0
-    private var webViewOnTouchDispatcher: WebViewOnTouchDispatcher? = null
     private var touchIsDown: Boolean = false
 
     override fun onFinishInflate() {
         super.onFinishInflate()
+        webView = findViewById(R.id.webView)
         header = findViewById(R.id.button1)
         footer = findViewById(R.id.button2)
-    }
-
-    fun bind(webView: WebViewOnTouchDispatcher) {
-        this.webViewOnTouchDispatcher = webView
     }
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
@@ -62,7 +65,7 @@ class ArticleContainer @JvmOverloads constructor(context: Context, attrs: Attrib
         ViewCompat.offsetTopAndBottom(footer, offset)
     }
 
-    fun onPageLoaded(webContentHeightDp: Int) {
+    fun onReady(webContentHeightDp: Int) {
         this.webContentHeightDp = webContentHeightDp
         layoutHeaderFooter()
     }
@@ -104,17 +107,16 @@ class ArticleContainer @JvmOverloads constructor(context: Context, attrs: Attrib
     }
 
     override fun onTouchEvent(ev: MotionEvent): Boolean {
-        //https://github.com/ogapants/YalinEmail/blob/7a85d402681f3dfe27b9b83a1d6044d787d2715c/android-unifiedemail/src/main/java/com/android/mail/browse/ConversationContainer.java#L134
         when (ev.actionMasked) {
             MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> touchIsDown = false
             MotionEvent.ACTION_MOVE -> if (!touchIsDown) {
                 val newEvent = MotionEvent.obtain(ev)
                 newEvent.action = MotionEvent.ACTION_DOWN
-                webViewOnTouchDispatcher?.dispatcherOnTouchEvent(newEvent)
+                webView.onTouchEvent(newEvent)
                 touchIsDown = true
             }
         }
-        return webViewOnTouchDispatcher?.dispatcherOnTouchEvent(ev) ?: super.onTouchEvent(ev)
+        return webView.onTouchEvent(ev)
     }
 
     override fun onInterceptTouchEvent(ev: MotionEvent): Boolean {
@@ -136,9 +138,5 @@ class ArticleContainer @JvmOverloads constructor(context: Context, attrs: Attrib
     fun fetchFooterHeight(): Int {
         measureOverlayView(footer)
         return footer.measuredHeight
-    }
-
-    interface WebViewOnTouchDispatcher {
-        fun dispatcherOnTouchEvent(ev: MotionEvent): Boolean
     }
 }

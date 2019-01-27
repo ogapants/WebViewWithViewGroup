@@ -1,5 +1,6 @@
 package com.github.ogapants.webviewwithviewgroup
 
+import android.annotation.SuppressLint
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -11,9 +12,10 @@ import android.webkit.WebView
 
 class WebViewActivity : AppCompatActivity() {
 
-    lateinit var webView: ArticleWebView
-    lateinit var container: ArticleContainer
+    private lateinit var webView: ArticleWebView
+    private lateinit var container: ArticleContainer
 
+    @SuppressLint("SetJavaScriptEnabled")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_web_view)
@@ -26,18 +28,16 @@ class WebViewActivity : AppCompatActivity() {
                 container.dispatchScroll(oldScrollY, scrollY)
             }
         })
-        container.bind(webView)
-
-
         WebView.setWebContentsDebuggingEnabled(true)
-        val settings = webView.settings
-        settings.setAppCacheEnabled(true)
-        settings.setJavaScriptEnabled(true)
-        settings.setUseWideViewPort(false)
-        settings.setSupportZoom(false)
-        settings.setBuiltInZoomControls(false)
-        settings.setLoadWithOverviewMode(false)
-        settings.setLayoutAlgorithm(WebSettings.LayoutAlgorithm.NARROW_COLUMNS)
+        webView.settings.apply {
+            javaScriptEnabled = true
+            useWideViewPort = false
+            builtInZoomControls = false
+            loadWithOverviewMode = false
+            layoutAlgorithm = WebSettings.LayoutAlgorithm.NARROW_COLUMNS
+            setAppCacheEnabled(true)
+            setSupportZoom(false)
+        }
         webView.addJavascriptInterface(JavascriptBridge(), "JS")
 
         val htmlText: String = String.format(
@@ -51,12 +51,12 @@ class WebViewActivity : AppCompatActivity() {
 
     private fun onDomContentLoaded(contentHeight: Int) {
         val webContentHeightDp = webView.webPxToScreenPx(contentHeight)
-        container.onPageLoaded(webContentHeightDp)
+        container.onReady(webContentHeightDp)
     }
 
     private inner class JavascriptBridge {
 
-        @Suppress("unused")
+        @Suppress("unused", "FunctionName")
         @JavascriptInterface
         fun _onDomContentLoaded(contentHeight: Int) {
             Handler(Looper.getMainLooper()).post {
