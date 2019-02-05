@@ -5,10 +5,9 @@ import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.support.v7.app.AppCompatActivity
+import android.util.Log
 import android.view.View
-import android.webkit.JavascriptInterface
-import android.webkit.WebSettings
-import android.webkit.WebView
+import android.webkit.*
 
 class WebViewActivity : AppCompatActivity() {
 
@@ -38,6 +37,12 @@ class WebViewActivity : AppCompatActivity() {
             setAppCacheEnabled(true)
             setSupportZoom(false)
         }
+        webView.webChromeClient = object :WebChromeClient(){
+            override fun onConsoleMessage(consoleMessage: ConsoleMessage?): Boolean {
+                Log.d("WebViewActivity", "onConsoleMessage ${consoleMessage?.message()}")
+                return super.onConsoleMessage(consoleMessage)
+            }
+        }
         webView.addJavascriptInterface(JavascriptBridge(), "JS")
 
         val htmlText: String = String.format(
@@ -59,7 +64,17 @@ class WebViewActivity : AppCompatActivity() {
         @Suppress("unused", "FunctionName")
         @JavascriptInterface
         fun _onDomContentLoaded(contentHeight: Int) {
+            Log.d("WebViewActivity", "_onDomContentLoaded")
+//            Handler(Looper.getMainLooper()).post {
+//                onDomContentLoaded(contentHeight)
+//            }
+        }
+
+        @Suppress("unused", "FunctionName")
+        @JavascriptInterface
+        fun _onContentReady(contentHeight: Int){
             Handler(Looper.getMainLooper()).post {
+                Log.d("WebViewActivity", "_onContentReady")
                 onDomContentLoaded(contentHeight)
             }
         }

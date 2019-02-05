@@ -279,19 +279,52 @@ class HtmlTemplate {
         const val template: String = """
 <!DOCTYPE html>
 <html>
-<script type="text/javascript">
-window.addEventListener("DOMContentLoaded", function () {
-   var contentHeight = document.getElementById("content").offsetHeight
-   window.JS._onDomContentLoaded(contentHeight);
-});
-</script>
+<style>
+  .initial-load {
+      /* 0x0 and 1x1 may be short-circuited by WebView */
+      width: 2px;
+      height: 2px;
+      -webkit-transform: translate3d(0, 0, 1px);
+      -webkit-animation-name: initial-load-noop-animation;
+      -webkit-animation-duration: 1ms;  /* doesn't matter */
+  }
+
+  /* Animating the z-position is fast and does not actually change anything in the default
+   * perspective.
+   */
+  @-webkit-keyframes initial-load-noop-animation {
+      from {
+          -webkit-transform: translate3d(0, 0, 1px);
+      }
+      to {
+          -webkit-transform: translate3d(0, 0, 0);
+      }
+  }
+</style>
 <body>
 <div id="header-spacer" style="height: %spx;"></div>
 <div id="content">
 %s
 </div>
 <div id="footer-spacer" style="height: %spx;"></div>
+<div id="initial-load-signal" class="initial-load"></div>
 </body>
+<script type="text/javascript">
+window.addEventListener("DOMContentLoaded", function () {
+   var contentHeight = document.getElementById("content").offsetHeight;
+   window.JS._onDomContentLoaded(contentHeight);
+});
+function onContentReady(event) {
+    var contentHeight = document.getElementById("content").offsetHeight;
+    window.JS._onContentReady(contentHeight);
+}
+
+function setupContentReady() {
+    var signalDiv = document.getElementById("initial-load-signal");
+    signalDiv.addEventListener("webkitAnimationStart", onContentReady, false);
+}
+setupContentReady();
+</script>
 </html>
 """
 
