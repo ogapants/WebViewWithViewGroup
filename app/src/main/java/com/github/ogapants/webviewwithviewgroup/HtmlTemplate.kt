@@ -281,7 +281,7 @@ class HtmlTemplate {
 <html>
 <script type="text/javascript">
 window.addEventListener("DOMContentLoaded", function () {
-   var contentHeight = document.getElementById("content").offsetHeight
+   var contentHeight = document.getElementById("content").offsetHeight;
    window.JS._onDomContentLoaded(contentHeight);
 });
 </script>
