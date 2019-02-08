@@ -1,11 +1,12 @@
 # WebViewWithViewGroup
 
 Sample for DroidKaigi2019 session
-"WebView+ViewGroupを実現するAOSPメールアプリの内部実装とニュースアプリへの応用" 
+
+"WebView+ViewGroupを実現するAOSPメールアプリの内部実装とニュースアプリへの応用"  
 "Internal implemention of AOSP mail app that makes WebView and ViewGroup possible and how to apply it to news apps"  
 https://droidkaigi.jp/2019/timetable/70923
 
-##　Before
+## Before
 
 using Pixel2XL emulator
 ```xml
